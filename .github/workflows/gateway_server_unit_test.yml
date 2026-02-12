@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build Auth Service
+    name: Build gateway Service
     runs-on: ubuntu-latest
 
     steps:
