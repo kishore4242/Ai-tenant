@@ -4,8 +4,13 @@ on:
   push:
     branches:
       - main
-  paths:
-    - 'gateway/**'
+    paths:
+      - 'gateway/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'gateway/**'
 
 jobs:
   build:
@@ -23,6 +28,9 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
+      - name: Verify Java Version
+        run: java -version
+
       - name: Run Maven Tests
-        working-directory: ./gateway
+        working-directory: gateway
         run: mvn clean test

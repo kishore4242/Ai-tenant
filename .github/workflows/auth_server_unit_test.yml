@@ -6,10 +6,15 @@ on:
       - main
     paths:
       - 'auth/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'auth/**'
 
 jobs:
   build:
-    name: Build auth Service
+    name: Build Auth Service
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +28,9 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
+      - name: Verify Java Version
+        run: java -version
+
       - name: Run Maven Tests
-        working-directory: ./auth
+        working-directory: auth
         run: mvn clean test
