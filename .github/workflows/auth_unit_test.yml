@@ -1,0 +1,48 @@
+name: Auth Service CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'auth/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'auth/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build Auth Module
+        working-directory: ./auth
+        run: mvn clean verify
+
+      - name: Upload Test Reports (if failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-test-reports
+          path: auth/target/surefire-reports/
