@@ -1,4 +1,4 @@
-package com.aitenant.auth.models;
+package com.aitenant.auth.dto;
 
 
 import lombok.Data;

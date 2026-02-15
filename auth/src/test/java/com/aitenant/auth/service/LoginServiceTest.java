@@ -44,7 +44,7 @@ public class LoginServiceTest {
         when(passwordEncoder.encode("password"))
                 .thenReturn("hashed");
         ResponseEntity<?> response =
-                loginService.register("test@example.com", "password");
+                loginService.register("test@example.com", "password","TCS");
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(registerUserRepo).save(any(RegisterUser.class));
     }
@@ -55,7 +55,7 @@ public class LoginServiceTest {
                 .thenReturn(Optional.of(new RegisterUser()));
 
         ResponseEntity<?> response =
-                loginService.register("test@example.com", "password");
+                loginService.register("test@example.com", "password","TCS");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(" Email is already in registered", response.getBody());

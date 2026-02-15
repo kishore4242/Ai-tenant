@@ -21,6 +21,9 @@ public class RegisterUser {
     private String email;
     @Column(name = "password", nullable = false,length = 150)
     private String password;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
     @Column(name = "role", nullable = false, length = 50)
     private String role;
     @Column(name = "status", nullable = false, length = 20)

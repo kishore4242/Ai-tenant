@@ -27,7 +27,7 @@ public class MyUserDetails implements UserDetailsService {
                 .password(user.getPassword())
                 .authorities(user.getRole())
                 .disabled(false)
-//                !"INACTIVE".equals(user.getStatus())
+//                .accountLocked(!"INACTIVE".equals(user.getStatus()))
                 .build();
     }
 }
