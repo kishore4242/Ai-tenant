@@ -1,7 +1,8 @@
 package com.aitenant.auth.controller;
 
 
-import com.aitenant.auth.models.Login;
+import com.aitenant.auth.dto.Register;
+import com.aitenant.auth.dto.Login;
 import com.aitenant.auth.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Login login){
-        return loginService.register(login.getUsername(), login.getPassword());
+    public ResponseEntity<?> registerUser(@RequestBody Register login){
+        return loginService.register(login.getUsername(), login.getPassword(), login.getTenantName());
     }
 }
