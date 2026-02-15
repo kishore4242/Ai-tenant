@@ -4,11 +4,11 @@ on:
   push:
     branches: ["main"]
     paths:
-      - 'auth-service/**'
+      - 'auth/**'
   pull_request:
     branches: ["main"]
     paths:
-      - 'auth-service/**'
+      - 'auth/**'
 
 jobs:
   build:
