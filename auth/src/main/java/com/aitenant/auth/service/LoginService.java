@@ -28,7 +28,7 @@ public class LoginService {
     private final JWTFilter jwtFilter;
     private final RegisterUserRepo registerUserRepo;
     private final PasswordEncoder passwordEncoder;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final TenantRepo tenantRepo;
 
     public ResponseEntity<?> login(String username, String password) {
