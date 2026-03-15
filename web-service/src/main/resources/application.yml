@@ -1,0 +1,20 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: web-service
+  ai:
+    model:
+      chat: ollama
+    ollama:
+      chat:
+        options:
+          model: gemma3:1b
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aitenant
+    username: postgres
+    password: kishore
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

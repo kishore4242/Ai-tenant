@@ -12,6 +12,8 @@ public class CustomRoutes {
         return routeLocatorBuilder.routes()
                 .route(locator -> locator.path("/api/auth/**")
                         .uri("http://localhost:8082"))
+                .route(locator -> locator.path("/api/ai/**")
+                        .uri("http://localhost:8083"))
                 .build();
     }
 }
