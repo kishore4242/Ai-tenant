@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -25,12 +26,12 @@ public class JWTFilter {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setClaims(detailsList)
+                .claim("tenant_id",tenant)
                 .setExpiration(
                         new Date(System.currentTimeMillis() + expiration)
                 )
                 .signWith(
-                        Keys.hmacShaKeyFor(secret.getBytes()),
+                        Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)),
                         SignatureAlgorithm.HS256
                 )
                 .compact();

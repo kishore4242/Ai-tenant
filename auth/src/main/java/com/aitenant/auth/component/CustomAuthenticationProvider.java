@@ -3,7 +3,6 @@ package com.aitenant.auth.component;
 import com.aitenant.auth.service.MyUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,7 +24,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private final PasswordEncoder passwordEncoderFactories;
 
     @Override
-    public @Nullable Authentication authenticate(@NonNull Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(@NonNull Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = Objects.requireNonNull(authentication.getCredentials()).toString();
         UserDetails user = myUserDetails.loadUserByUsername(username);

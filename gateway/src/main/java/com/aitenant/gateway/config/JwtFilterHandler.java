@@ -55,9 +55,13 @@ public class JwtFilterHandler implements GlobalFilter, Ordered {
                     .parseClaimsJws(token)
                     .getBody();
 
+            Long tenantId = claims.get("tenant_id", Long.class);
+            String userEmail = claims.getSubject();
+
             ServerHttpRequest request = exchange.getRequest()
                     .mutate()
-                    .header("X-User-Id", claims.getSubject())
+                    .header("X-tenant-Id", String.valueOf(tenantId))
+                    .header("X-user-email", userEmail)
                     .build();
 
             return chain.filter(exchange.mutate().request(request).build());
@@ -74,6 +78,6 @@ public class JwtFilterHandler implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -1;
+        return 0;
     }
 }
