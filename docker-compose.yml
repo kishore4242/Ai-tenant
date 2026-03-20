@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+
+  eureka:
+    image: kishore4242421/ai-eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+
+  gateway-service:
+    image: kishore4242421/ai-gateway-service:1.0.0
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=n8V7sXk3QzP9Lw2R5tY6BvC1HjF4MNdE8Uo0aSxG7pKqZrT9uI3WcYhD2eJfL6m
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      - eureka
+
+  auth-service:
+    image: kishore4242421/auth-service:1.0.0
+    container_name: auth-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql-db:5432/aitenant
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=kishore
+      - SPRING_REDIS_HOST=redis-db
+      - SPRING_REDIS_PORT=6379
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - USER_GMAIL=kishore4242421@gmail.com
+      - GMAIL_PASSWORD=123456
+    depends_on:
+      - postgresql-db
+      - redis-db
+      - eureka
+
+  web-service:
+    image: kishore4242421/ai-service:1.0.0
+    container_name: web-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql-db:5432/aitenant
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=kishore
+      - SPRING_REDIS_HOST=redis-db
+      - SPRING_REDIS_PORT=6379
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      - postgresql-db
+      - redis-db
+      - eureka
+
+  redis-db:
+    image: redis:7.4-alpine
+    container_name: redis-db
+    restart: always
+    ports:
+      - "6379:6379"
+
+  postgresql-db:
+    image: postgres:16
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kishore
+      POSTGRES_DB: aitenant
+    ports:
+      - "5432:5432"
