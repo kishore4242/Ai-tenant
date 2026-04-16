@@ -1,7 +1,7 @@
 package com.aitenant.auth.service;
 
 
-import com.aitenant.auth.filters.JWTFilter;
+import com.aitenant.auth.filters.JWTFilterService;
 import com.aitenant.auth.models.RegisterUser;
 import com.aitenant.auth.repository.RegisterUserRepo;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ public class LoginServiceTest {
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private JWTFilter jwtFilter;
+    private JWTFilterService jwtFilterService;
 
     @Mock
     private RegisterUserRepo registerUserRepo;

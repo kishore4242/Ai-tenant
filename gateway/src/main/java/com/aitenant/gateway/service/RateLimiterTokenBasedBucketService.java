@@ -22,7 +22,6 @@ public class RateLimiterTokenBasedBucketService {
 
         try(Jedis jedis = jedisPool.getResource()){
             log.info("Connection established to jedis");
-            System.out.println("Jedis connected successfully");
             fillCurrentEntryToken(clientId, jedis);
             String currentToken = jedis.get(token);
             long tokenValue = currentToken != null ? Long.parseLong(currentToken) : rateLimiterProperties.getCapacity();

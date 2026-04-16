@@ -1,7 +1,8 @@
 package com.aitenant.auth.service;
 
-import com.aitenant.auth.configuration.TenantCacheLoader;
-import com.aitenant.auth.filters.JWTFilter;
+import com.aitenant.auth.dto.AuthenticationResponse;
+import com.aitenant.auth.dto.RefreshTokenRequest;
+import com.aitenant.auth.filters.JWTFilterService;
 import com.aitenant.auth.models.RegisterUser;
 import com.aitenant.auth.models.Tenant;
 import com.aitenant.auth.repository.RegisterUserRepo;
@@ -20,12 +21,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 @Service
 @RequiredArgsConstructor
 public class LoginService {
 
     private final AuthenticationManager authenticationManager;
-    private final JWTFilter jwtFilter;
+    private final JWTFilterService jwtFilterService;
     private final RegisterUserRepo registerUserRepo;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -41,15 +45,22 @@ public class LoginService {
                     .findByEmail(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            String jwtToken = jwtFilter.generateToken(
-                    userDetails.getUsername(),
+            String refreshToken = "Bearer " + jwtFilterService.generateRefreshToken(
+                    Objects.requireNonNull(userDetails).getUsername(),
                     user.getTenant().getId()
 
             );
+            String accessToken = "Bearer " + jwtFilterService.generateAccessToken(
+                    userDetails.getUsername(),
+                    user.getTenant().getId()
+            );
+            redisTemplate.opsForValue().set("refresh-token:"+userDetails.getUsername(),refreshToken,7*24*60*60, TimeUnit.SECONDS);
+
+            AuthenticationResponse response = generateAuthenticationResponse(accessToken, refreshToken);
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
-                    .body("Authentication successful");
+                    .header(HttpHeaders.AUTHORIZATION, accessToken)
+                    .body(response);
         }
         catch (BadCredentialsException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
@@ -95,5 +106,24 @@ public class LoginService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Something went wrong"+e.getMessage());
         }
+    }
+
+    private AuthenticationResponse generateAuthenticationResponse(String accessToken, String refreshToken){
+        return new AuthenticationResponse(accessToken, refreshToken);
+    }
+
+    public ResponseEntity<?> generateRefreshToken(RefreshTokenRequest token){
+        String refreshToken = token.getRefreshToken();
+        if(refreshToken == null || !refreshToken.startsWith("Bearer")){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        String extractedRefreshToken = refreshToken.substring(7);
+        String username = jwtFilterService.extractUsername(extractedRefreshToken);
+        Long tenant_id = jwtFilterService.extractTenantId(extractedRefreshToken);
+        if(username != null && !jwtFilterService.isTokenExpired(extractedRefreshToken) && tenant_id != null){
+            String newAccessToken = jwtFilterService.generateRefreshToken(username, tenant_id);
+            return ResponseEntity.ok().body(generateAuthenticationResponse(newAccessToken, token.getRefreshToken()));
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

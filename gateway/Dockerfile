@@ -18,4 +18,4 @@ COPY --from=build /gateway/target/*.jar gateway.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","gayeway.jar"]
+ENTRYPOINT ["java","-jar","gateway.jar"]
