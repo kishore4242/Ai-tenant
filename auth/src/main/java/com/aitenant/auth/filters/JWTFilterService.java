@@ -1,6 +1,7 @@
 package com.aitenant.auth.filters;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -22,11 +23,11 @@ public class JWTFilterService {
     @Value("${authentication.refresh-token}")
     private long refreshTokenExpiration;
 
-    public String generateRefreshToken(String username, Long tenant) {
+    public String generateAccessToken(String username, Long tenant) {
         return generateToken(username, expiration, tenant, "access");
     }
 
-    public String generateAccessToken(String username, Long tenant){
+    public String generateRefreshToken(String username, Long tenant){
         return generateToken(username, refreshTokenExpiration, tenant, "refresh");
     }
 
@@ -48,11 +49,16 @@ public class JWTFilterService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }
+        catch (ExpiredJwtException e){
+            return e.getClaims();
+        }
     }
 
     public String extractUsername(String token) {
