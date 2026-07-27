@@ -1,0 +1,44 @@
+name: Build Gateway Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'gateway/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: gateway
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build
+        run: mvn clean package -DskipTests
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./gateway
+          file: ./gateway/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/gateway:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/gateway:${{ github.sha }}
