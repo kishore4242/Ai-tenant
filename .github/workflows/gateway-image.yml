@@ -1,4 +1,4 @@
-name: Build Gateway Service
+name: Build and Push Gateway Service
 
 on:
   push:
@@ -6,42 +6,58 @@ on:
       - main
     paths:
       - 'gateway/**'
+      - '.github/workflows/gateway.yml'
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: gateway
 
-    steps:
-      - uses: actions/checkout@v4
+    permissions:
+      contents: read
 
-      - uses: actions/setup-java@v4
+    steps:
+      # Checkout repository
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Setup Java 21
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '21'
-          distribution: 'temurin'
           cache: maven
 
-      - name: verify java version
+      # Verify Java installation
+      - name: Verify Java
         run: |
           echo "JAVA_HOME=$JAVA_HOME"
           java -version
           javac -version
           mvn -version
 
-      - name: Build
+      # Build the application
+      - name: Build Gateway
         run: mvn clean package -DskipTests
 
-      - uses: docker/setup-buildx-action@v3
+      # Setup Docker Buildx
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - uses: docker/login-action@v3
+      # Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: docker/build-push-action@v5
+      # Build and Push Docker Image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
         with:
           context: ./gateway
           file: ./gateway/Dockerfile
@@ -49,3 +65,5 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/gateway:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/gateway:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
