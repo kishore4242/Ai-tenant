@@ -11,9 +11,9 @@ public class CustomRoutes {
     public RouteLocator customRouteLocator(RouteLocatorBuilder routeLocatorBuilder){
         return routeLocatorBuilder.routes()
                 .route(locator -> locator.path("/api/auth/**")
-                        .uri("http://localhost:8082"))
+                        .uri("lb://auth"))
                 .route(locator -> locator.path("/api/ai/**")
-                        .uri("http://localhost:8083"))
+                        .uri("lb://web-service"))
                 .build();
     }
 }
