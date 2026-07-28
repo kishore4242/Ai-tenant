@@ -24,6 +24,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: verify java version
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version
+          javac -version
+          mvn -version
+
       - name: Build
         run: mvn clean package -DskipTests
 
