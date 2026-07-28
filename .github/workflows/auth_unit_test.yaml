@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'auth/**'
   pull_request:
     branches:
       - main
