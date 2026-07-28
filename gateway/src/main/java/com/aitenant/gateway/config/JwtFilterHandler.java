@@ -20,7 +20,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.nio.charset.StandardCharsets;
-import java.util.jar.JarEntry;
 
 @Component
 @RequiredArgsConstructor
@@ -63,7 +62,7 @@ public class JwtFilterHandler implements GlobalFilter, Ordered {
                     .parseClaimsJws(token)
                     .getBody();
             String savedToken = jedis.get("blocked-token:"+claims.getSubject());
-            if(!savedToken.equals(token)){
+            if((savedToken!=null) && (savedToken.equals(token))){
                 return unauthorized(exchange);
             }
 
