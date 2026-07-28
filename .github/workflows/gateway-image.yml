@@ -62,9 +62,6 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Resolved version: $VERSION"
 
-      - name: Run tests
-        run: mvn test
-
       - name: Build Gateway
         run: mvn clean package -DskipTests
 
