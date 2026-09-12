@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class AiGenerationService {
 
     private final ChatClient chatClient;
+    private final ChatHistoryService chatHistoryService;
 
     public AiGenerationService(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
