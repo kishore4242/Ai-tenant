@@ -2,6 +2,7 @@ package com.aitenant.gateway.config;
 
 import com.aitenant.gateway.service.RateLimiterService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenBucketRateLimitingConfiguration implements GlobalFilter, Ordered {
@@ -25,10 +27,12 @@ public class TokenBucketRateLimitingConfiguration implements GlobalFilter, Order
         try {
             if(!rateLimiterService.isAllowedRequest(clientIp)){
                 exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+                log.error("Too many request: {}", clientIp);
                 return exchange.getResponse().setComplete();
             }
         } catch (Exception e) {
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
             return exchange.getResponse().setComplete();
         }
         return chain.filter(exchange);
