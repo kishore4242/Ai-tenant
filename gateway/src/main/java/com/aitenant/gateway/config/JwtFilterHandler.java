@@ -39,7 +39,7 @@ public class JwtFilterHandler implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        if (path.startsWith("/api/auth/")) {
+        if(isPublicPath(path)){
             return chain.filter(exchange);
         }
 
@@ -90,5 +90,16 @@ public class JwtFilterHandler implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         return 0;
+    }
+
+    private boolean isPublicPath(String path){
+        return path.startsWith("/api/auth/")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/webjars/")
+                || path.equals("/swagger-ui.html")
+                || path.equals("/v3/api-docs")
+                || path.startsWith("/v3/api-docs/")
+                || path.equals("/auth/v3/api-docs")
+                || path.equals("/web-service/v3/api-docs");
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.util.Arrays;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -20,13 +22,13 @@ public class RateLimiterTokenBasedBucketService {
         // Check if the user can allowed the request ot not
         String token = TOKEN_KEY_PREFIX+clientId;
 
-        try(Jedis jedis = jedisPool.getResource()){
+        try(Jedis jedis = jedisPool.getResource()) {
             log.info("Connection established to jedis");
             fillCurrentEntryToken(clientId, jedis);
             String currentToken = jedis.get(token);
             long tokenValue = currentToken != null ? Long.parseLong(currentToken) : rateLimiterProperties.getCapacity();
 
-            if(tokenValue <= 0){
+            if (tokenValue <= 0) {
                 return false;
             }
             long decrement = jedis.decr(token);
@@ -35,6 +37,8 @@ public class RateLimiterTokenBasedBucketService {
         catch (Exception e){
             System.out.println("Some exception during the jedis connect");
             log.error(e.getMessage());
+            log.error(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
             return true;
         }
 
