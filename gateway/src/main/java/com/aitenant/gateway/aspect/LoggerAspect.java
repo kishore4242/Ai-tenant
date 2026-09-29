@@ -1,17 +1,17 @@
-package com.aitenant.auth.aspect;
+package com.aitenant.gateway.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.MDC;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Component;
 
 @Component
-@Aspect
+@EnableAspectJAutoProxy
 @Slf4j
-public class LoggingAspect {
-    @Around("execution(* com.aitenant.auth.controller.*.*(..))")
+public class LoggerAspect {
+    @Around("execution(* com.aitenant.gateway.service.*.*(..))")
     public Object controllerLogger(ProceedingJoinPoint joinPoint) throws Throwable{
         String traceId = MDC.get("traceId");
         String className = joinPoint.getTarget().getClass().getSimpleName();
